@@ -1,25 +1,45 @@
 {
   "name": "spinglez.github.io",
   "version": "0.1.0",
+  "proxy": "http://localhost:8080",
   "private": true,
   "dependencies": {
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
+    "react-router": "^5.1.2",
     "react-scripts": "2.1.8"
   },
   "scripts": {
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "start-js": "sh -ac '. ./.env; react-scripts-ts start'",
+    "start-js-staging": "sh -ac '. ./.env.staging; react-scripts-ts start'",
+    "start": "npm-run-all -p watch-css start-js",
+    "start-staging": "npm-run-all -p watch-css start-js-staging",
+    "build-js": "react-scripts-ts build && rm build/index.html",
+    "build": "npm-run-all build-css build-js",
+    "build-env": "sh -ac '. ./.env.${REACT_APP_ENV}; npm run build'",
+    "build:production": "REACT_APP_ENV=production npm run build-env",
+    "build-css": "node-sass-chokidar --include-path ./node_modules src/styles -o src/css",
+    "watch-css": "npm run build-css && node-sass-chokidar --include-path ./node_modules src/styles -o src/css --watch --recursive",
+    "test": "react-scripts-ts test --env=jsdom",
+    "eject": "react-scripts-ts eject",
+    "build-deps": "cd ../../common/mode-app-plain && npm run build-hard && cd ../../common/mode-ui-components && npm run build-hard && cd ../../solutions/vrc/frontend_common && npm run build-hard && cd ../../../projects/mmc_frontend && npm i",
+    "build-deps-no-lock": "cd ../../common/mode-app-plain && rm package-lock.json && npm run build-hard && cd ../../common/mode-ui-components && rm package-lock.json && npm run build-hard && cd ../../solutions/vrc/frontend_common && rm package-lock.json && npm run build-hard && cd ../../../projects/mmc_frontend && rm package-lock.json && npm i",
+    "trans:compile": "tsc -p . --target ES6 --module es6 --jsx preserve --outDir extracted",
+    "trans:extract": "babel \"extracted/**/*.jsx\"",
   },
   "eslintConfig": {
     "extends": "react-app"
   },
-  "browserslist": [
-    ">0.2%",
-    "not dead",
-    "not ie <= 11",
-    "not op_mini all"
-  ]
+  "browserslist": {
+    "production": [
+      ">0.2%",
+      "not dead",
+      "not op_mini all"
+    ],
+    "development": [
+      "last 1 chrome version",
+      "last 1 firefox version",
+      "last 1 safari version"
+    ]
+  }
 }
